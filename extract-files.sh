@@ -7,7 +7,7 @@
 
 set -e
 
-DEVICE=surya
+DEVICE=toco
 VENDOR=xiaomi
 
 # Load extract_utils and do some sanity checks
@@ -16,12 +16,25 @@ if [[ ! -d "${MY_DIR}" ]]; then MY_DIR="${PWD}"; fi
 
 LINEAGE_ROOT="${MY_DIR}"/../../..
 
-HELPER="${LINEAGE_ROOT}/vendor/lineage/build/tools/extract_utils.sh"
+HELPER="${LINEAGE_ROOT}/vendor/nitrogen/build/tools/extract_utils.sh"
 if [ ! -f "${HELPER}" ]; then
     echo "Unable to find helper script at ${HELPER}"
     exit 1
 fi
 source "${HELPER}"
+
+function blob_fixup() {
+    case "${1}" in
+    product/lib/libdpmframework.so)
+        patchelf --replace-needed "libcutils.so" "libcutils-v29.so" "${2}"
+        patchelf --add-needed "libcutils.so" "${2}"
+        ;;
+    product/lib64/libdpmframework.so)
+        patchelf --replace-needed "libcutils.so" "libcutils-v29.so" "${2}"
+        patchelf --add-needed "libcutils.so" "${2}"
+        ;;
+    esac
+}
 
 while [ "${#}" -gt 0 ]; do
     case "${1}" in

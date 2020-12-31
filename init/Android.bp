@@ -14,10 +14,12 @@
 // limitations under the License.
 //
 cc_library_static {
-    name: "libinit_surya",
-    srcs: ["init_surya.cpp"],
+    name: "libinit_toco",
+    srcs: ["init_toco.cpp"],
+    shared_libs: [
+        "libbase",
+    ],
     recovery_available: true,
-    whole_static_libs: ["libbase"],
     include_dirs: [
         "system/core/base/include",
         "system/core/init"

@@ -11,16 +11,11 @@ $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 # Setup dalvik vm configs
 $(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 
-# Include pixelgapps
-$(call inherit-product-if-exists, vendor/pixelgapps/pixel-gapps.mk)
-
-# Include Gapps
-$(call inherit-product-if-exists, vendor/gapps/config.mk)
-
-$(call inherit-product-if-exists, vendor/google/gms/config.mk)
-
 # Get non-open-source specific aspects
-$(call inherit-product-if-exists, vendor/xiaomi/surya/surya-vendor.mk)
+$(call inherit-product-if-exists, vendor/xiaomi/toco/toco-vendor.mk)
+
+# Include PSU if synced
+$(call inherit-product-if-exists, vendor/google/psu/google-psu.mk)
 
 # Enable updating of APEXes
 $(call inherit-product, $(SRC_TARGET_DIR)/product/updatable_apex.mk)
@@ -32,12 +27,16 @@ PRODUCT_BUILD_SUPER_PARTITION := false
 BOARD_BUILD_PRODUCT_IMAGE := true
 PRODUCT_SHIPPING_API_LEVEL := 29
 PRODUCT_TARGET_VNDK_VERSION := 29
+PRODUCT_EXTRA_VNDK_VERSIONS := $(PRODUCT_TARGET_VNDK_VERSION)
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 
 # AAPT config
 PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := xxhdpi
+
+PRODUCT_CHARACTERISTICS := nosdcard
+TARGET_HAS_FOD := true
 
 # ANT+
 PRODUCT_PACKAGES += \
@@ -51,23 +50,16 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/audio/audio_policy_engine_configuration.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/audio_policy_engine_configuration.xml \
     $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/audio/audio_policy_configuration.xml \
-    $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/audio_policy_configuration.xml
-
-# Binder
-PRODUCT_PACKAGES += \
-    libhwbinder \
-    libhwbinder.vendor \
-    libhidltransport \
-    libhidltransport.vendor
-
-# Bluetooth
-PRODUCT_PACKAGES += \
-    BluetoothQti \
-    libbtconfigstore
+    $(LOCAL_PATH)/audio/audio_policy_configuration.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/audio_policy_configuration.xml \
+    $(LOCAL_PATH)/audio/mixer_paths_wcd9375.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/mixer_paths_wcd9375.xml
 
 # Camera
 PRODUCT_PACKAGES += \
     Snap
+
+# Charger
+PRODUCT_PACKAGES += \
+    charger_res_images
 
 # Device Settings
 PRODUCT_PACKAGES += \
@@ -76,15 +68,13 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/parts/privapp-permissions-parts.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-parts.xml
 
-# Display/Graphics
-PRODUCT_PACKAGES += \
-    libdisplayconfig \
-    libqdMetaData \
-    libqdMetaData.system
-
 # Fastbootd
 PRODUCT_PACKAGES += \
     fastbootd
+
+# Fingerprint
+PRODUCT_PACKAGES += \
+    lineage.biometrics.fingerprint.inscreen@1.0-service.toco
 
 # FM
 PRODUCT_PACKAGES += \
@@ -98,28 +88,31 @@ PRODUCT_COPY_FILES += \
 
 # GPU Firmware
 PRODUCT_COPY_FILES += \
-	$(LOCAL_PATH)/prebuilt/a618_gmu.bin:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/firmware/a618_gmu.bin
+    $(LOCAL_PATH)/prebuilt/a618_gmu.bin:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/firmware/a618_gmu.bin
 
 # HIDL
 PRODUCT_PACKAGES += \
-    android.hidl.base@1.0
+    android.hidl.base@1.0 \
+    libhidltransport \
+    libhwbinder
+
+# HotwordEnrollement
+PRODUCT_COPY_FILES += \
+  	$(LOCAL_PATH)/configs/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
 
 # Init
 PRODUCT_PACKAGES += \
     init.mi_thermald.rc \
-    init.device.rc \
-    init.qcom.rc
+    init.recovery.qcom.rc
 
 # Keylayout
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/keylayout/uinput-fpc.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/uinput-fpc.kl \
-    $(LOCAL_PATH)/keylayout/uinput-goodix.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/uinput-goodix.kl \
-    $(LOCAL_PATH)/keylayout/gpio-keys.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/gpio-keys.kl \
-    $(LOCAL_PATH)/keylayout/sm6150-wcd9375-snd-card_Button_Jack.kl:$(TARGET_COPY_OUT_SYSTEM)/usr/keylayout/sm6150-wcd9375-snd-card_Button_Jack.kl
+    $(LOCAL_PATH)/keylayout/gpio-keys.kl:system/usr/keylayout/gpio-keys.kl \
+    $(LOCAL_PATH)/keylayout/sm8150-tavil-snd-card_Button_Jack.kl:system/usr/keylayout/sm8150-tavil-snd-card_Button_Jack.kl
 
 # Lights
 PRODUCT_PACKAGES += \
-    android.hardware.light@2.0-service.xiaomi_surya
+    android.hardware.light@2.0-service.toco
 
 # NFC
 PRODUCT_PACKAGES += \
@@ -151,17 +144,9 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.wifi.aware.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.wifi.aware.xml \
     frameworks/native/data/etc/android.hardware.wifi.rtt.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/android.hardware.wifi.rtt.xml
 
-# OTA
-PRODUCT_HOST_PACKAGES += \
-    signapk
-
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power@1.2-service.surya
-
-# Product init
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/vendor-overlay/etc/init.qcom.rc:$(TARGET_COPY_OUT_PRODUCT)/etc/init/init.qcom.rc
+    android.hardware.power@1.2-service.toco
 
 # RCS
 PRODUCT_PACKAGES += \
@@ -169,11 +154,9 @@ PRODUCT_PACKAGES += \
     PresencePolling \
     RcsService
 
-# Soong namespaces
-PRODUCT_SOONG_NAMESPACES += \
-    $(LOCAL_PATH) \
-    vendor/qcom/opensource/commonsys/packages/apps/Bluetooth \
-    vendor/qcom/opensource/commonsys/system/bt/conf
+# Sensor Configuration
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sensors/hals.conf:$(TARGET_COPY_OUT_SYSTEM)/etc/sensors/hals.conf
 
 # Telephony
 PRODUCT_PACKAGES += \
@@ -183,43 +166,26 @@ PRODUCT_PACKAGES += \
     qti_telephony_hidl_wrapper.xml \
     qti-telephony-utils \
     qti_telephony_utils.xml \
-    telephony-ext \
+    telephony-ext
 
 PRODUCT_BOOT_JARS += \
     telephony-ext
 
-# Thermal
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/prebuilt/thermal/lib/android.hardware.thermal@1.0.so:$(TARGET_COPY_OUT_SYSTEM)/lib/android.hardware.thermal@1.0.so \
-    $(LOCAL_PATH)/prebuilt/thermal/lib64/android.hardware.thermal@1.0.so:$(TARGET_COPY_OUT_SYSTEM)/lib64/android.hardware.thermal@1.0.so \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/bin/thermal-engine:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/bin/thermal-engine \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/bin/hw/android.hardware.thermal@1.0-service:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/hw/android.hardware.thermal@1.0-service \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/etc/thermal-engine.conf:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/thermal-engine.conf \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/etc/init/android.hardware.thermal@1.0-service.rc:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/init/android.hardware.thermal@1.0-service.rc \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/lib/hw/android.hardware.thermal@1.0-impl.so:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/lib/hw/android.hardware.thermal@1.0-impl.so \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/lib/hw/thermal.sm6150.so:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/lib/hw/thermal.sm6150.so \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/lib64/hw/android.hardware.thermal@1.0-impl.so:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/lib64/hw/android.hardware.thermal@1.0-impl.so \
-    $(LOCAL_PATH)/prebuilt/thermal/vendor/lib64/hw/thermal.sm6150.so:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/lib64/hw/thermal.sm6150.so
-
 # Vendor overlay
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/vendor-overlay/etc/qdcm_calib_data_nt36672c_huaxing_fhd_video_mode_dsi_panel.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/qdcm_calib_data_nt36672c_huaxing_fhd_video_mode_dsi_panel.xml \
-    $(LOCAL_PATH)/vendor-overlay/etc/qdcm_calib_data_nt36672c_tianma_fhd_video_mode_dsi_panel.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/qdcm_calib_data_nt36672c_tianma_fhd_video_mode_dsi_panel.xml \
-    $(LOCAL_PATH)/vendor-overlay/etc/wifi/WCNSS_qcom_cfg.ini:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/wifi/WCNSS_qcom_cfg.ini
+    $(LOCAL_PATH)/vendor-overlay/etc/dsi_xiaomi_f4_36_02_0b_fhd_cmd_display_mi.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/dsi_xiaomi_f4_36_02_0b_fhd_cmd_display_mi.xml \
+    $(LOCAL_PATH)/vendor-overlay/etc/dsi_xiaomi_f4_41_06_0a_fhd_cmd_display_mi.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/dsi_xiaomi_f4_41_06_0a_fhd_cmd_display_mi.xml \
+    $(LOCAL_PATH)/vendor-overlay/etc/dsi_xiaomi_f4_42_06_0c_fhd_cmd_display_mi.xml:$(TARGET_COPY_OUT_PRODUCT)/vendor_overlay/$(PRODUCT_TARGET_VNDK_VERSION)/etc/dsi_xiaomi_f4_42_06_0c_fhd_cmd_display_mi.xml
 
 # VNDK
-PRODUCT_TARGET_VNDK_VERSION := 29
-PRODUCT_EXTRA_VNDK_VERSIONS := 29
+PRODUCT_COPY_FILES += \
+    prebuilts/vndk/v29/arm64/arch-arm-armv8-a/shared/vndk-sp/libcutils.so:$(TARGET_COPY_OUT_SYSTEM)/lib/libcutils-v29.so \
+    prebuilts/vndk/v29/arm64/arch-arm64-armv8-a/shared/vndk-sp/libcutils.so:$(TARGET_COPY_OUT_SYSTEM)/lib64/libcutils-v29.so
 
 # WiFi
 PRODUCT_PACKAGES += \
     TetheringConfigOverlay \
     WifiOverlay
 
-# WFD
-PRODUCT_PACKAGES += \
-    libaacwrapper \
-    libnl
-
-PRODUCT_BOOT_JARS += \
-    WfdCommon
+PRODUCT_SOONG_NAMESPACES += \
+    $(LOCAL_PATH)

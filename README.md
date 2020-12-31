@@ -1,25 +1,25 @@
 Copyright (C) 2020 The LineageOS Project
 
-Unified Device Tree for Xiaomi POCO X3 / X3 NFC
+Device configuration for Xiaomi Mi Note 10 Lite
 =========================================
 
-The Xiaomi POCO X3 / X3 NFC (codenamed _"karna / surya"_) are mid range smartphones from Xiaomi's sub-brand Redmi and Poco, respectively.
+The Xiaomi Mi Note 10 Lite (codenamed _"toco"_) is a mid range smartphones from Xiaomi's sub-brand Mi.
 
-Both devices were announced and released in September 2020.
+Mi Note 10 Lite was announced and released in May 2020.
 
 ## Device specifications
 
 Basic   | Spec Sheet
 -------:|:-------------------------
-SoC     | Qualcomm SM6150 Snapdragon 732G
-CPU     | Octa-core (2x2.3 GHz Kryo 470 Gold & 6x1.8 GHz Kryo 470 Silver)
+SoC     | Qualcomm SDM730 Snapdragon 730G
+CPU     | Octa-core (2x2.2 GHz Kryo 470 Gold & 6x1.8 GHz Kryo 470 Silver)
 GPU     | Adreno 618
 Memory  | 6/8 GB RAM
-Shipped Android Version | 10 with MIUI 12
+Shipped Android Version | 10 with MIUI 11
 Storage | 64/128/256 GB
-Battery | Non-removable Li-Po 6000/5160 mAh battery
-Display | 1080 x 2400 pixels, 20:9 ratio, 6.67 inches, IPS LCD (~395 ppi density)
+Battery | Non-removable Li-Po 5260 mAh battery
+Display | 1080 x 2340 pixels, 19.5:9 ratio, 6.47 inches, AMOLED capacitive touchscreen (~398 ppi density)
 
 ## Device picture
 
-![Xiaomi POCO X3 / X3 NFC](https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-poco-x3-nfc-1.jpg "Xiaomi POCO X3 NFC")
+![Xiaomi Mi Note 10 Lite](https://fdn2.gsmarena.com/vv/pics/xiaomi/xiaomi-mi-note-10-lite-5.jpg)
